@@ -1,0 +1,88 @@
+# Paginator and relations
+{
+  users(first:3, page: 1){
+    paginatorInfo{
+      total
+      hasMorePages
+    }
+    data{
+      id
+    	email
+      jobs(first:2){
+        paginatorInfo{
+          total
+        }
+        data{
+          title
+        }
+      }
+    }
+  }
+}
+
+#Job By Status with paginaation
+{
+	jobsByStatus(status:PROCESSING, first: 3 ){
+    data{
+      title
+      status
+      user {
+        id
+        name
+      }
+    }
+  }
+}
+
+#Pagination with filter
+{
+	user(id: 1){
+    jobs(first: 5 , status:QUEUED){
+      data{
+        title
+        status
+      }
+    }
+  }
+}
+
+#Authentification
+
+#Affect token to user
+  mutation{
+    login(email: "jhon.doe.graaphql.com", password: "123456")
+  }
+
+#Get Auth user
+{
+  me{
+    name
+    email
+    jobs(first:5, status: PROCESSING){
+      data{
+        title
+      }
+    }
+  }
+}
+
+
+#Mutation create user
+mutation{
+  createUser(name: "Christopher Moore", email: "christopher@moore.fr", password: "123456"){
+    id
+    email
+  }
+}
+
+#create user with token
+#mutation{
+  createUser(name: "Christopher Moore", email: "christopher1@moore.fr", password: "123456"){
+    user{
+      id
+  	  email
+  }
+    token
+  }
+}
+
