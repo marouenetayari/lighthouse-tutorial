@@ -1,10 +1,47 @@
 type Query {
-    users: [User!]! @all
+    #me: User @field(resolver: "UserQuery@me")
+    me: User @auth(guard: "api")
+      users: [User!]! @paginate
     user(id: ID! @eq): User @find
+    #jobsByStatus(status: JobStatus!): [Job!]! @field(resolver: "JobQuery@byStatus")
+    jobsByStatus(status: JobStatus! @builder(method: "App\\Models\\Job@byStatus")): [Job!]! @paginate
+}
+
+
+type Mutation {
+    login(email: String!, password: String!): String @field(resolver: "AuthMutator@login")
+
+    createUser(
+        name: String! @rules(apply: ["email", "unique:users"])
+        email: String!
+        password: String! @hash
+    ): CreateUserPayload! @field(resolver: "UserMutator@create")
+}
+
+type CreateUserPayload{
+    user: User
+    token: String
 }
 
 type User {
     id: ID!
     name: String!
     email: String!
+    jobs(status: JobStatus): [Job!]!
+        @hasMany(type: "paginator", scopes: ["ofUserType"])
 }
+
+type Job {
+    id: ID!
+    title: String!
+    status: JobStatus!
+    user: User! @belongsTo
+}
+
+enum JobStatus {
+    QUEUED
+    PROCESSING
+    COMPLETED
+}
+
+
